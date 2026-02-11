@@ -1,0 +1,21 @@
+patent_id,year,title,abstract,country,applicant,ipc_cpc,source_url
+P1001,2024,Edge-Based Load Balancing for IoT Networks,A system for optimizing edge computing load balancing in distributed IoT environments using adaptive routing algorithms.,US,TechNova Inc,G06F,https://example.com/1
+P1002,2024,AI-Based Intrusion Detection System,A machine learning framework for anomaly detection in enterprise network security environments.,US,SecureNet Labs,G06N,https://example.com/2
+P1003,2024,Cloud Resource Allocation Optimization,A method for dynamic cloud resource scaling using predictive analytics.,IN,CloudWorks Pvt Ltd,G06F,https://example.com/3
+P1004,2024,Low Power Edge Devices,An architecture for reducing power consumption in edge devices for smart city infrastructure.,DE,EdgeSys GmbH,G06F,https://example.com/4
+P1005,2024,Blockchain Data Integrity Protocol,A blockchain-based data integrity verification protocol for distributed storage.,US,DataChain Corp,H04L,https://example.com/5
+P1006,2025,Green Data Center Cooling,A sustainable liquid cooling system for energy efficient data centers.,JP,GreenCompute Ltd,G06F,https://example.com/6
+P1007,2025,Federated Learning Security Framework,A secure federated learning model with encrypted gradient aggregation.,US,AIShield Corp,G06N,https://example.com/7
+P1008,2025,Water Efficient Data Center Management,A method to reduce water usage in hyperscale data center operations.,IN,HydroTech Solutions,G06F,https://example.com/8
+P1009,2025,AI Model Compression for Edge Devices,A model compression technique for deploying deep learning models on edge hardware.,US,EdgeAI Labs,G06N,https://example.com/9
+P1010,2025,Cloud Native Microservices Optimization,A microservices orchestration framework improving cloud performance and reliability.,UK,CloudStack Ltd,G06F,https://example.com/10
+P1011,2026,Sustainable AI Infrastructure,An AI infrastructure optimized for reduced carbon footprint and energy efficiency.,DE,GreenAI Systems,G06N,https://example.com/11
+P1012,2026,Responsible AI Governance Model,A compliance monitoring system for ethical and responsible AI deployments.,US,EthicsTech Inc,G06N,https://example.com/12
+P1013,2026,Edge AI for Smart Healthcare,A real-time edge AI solution for remote healthcare monitoring systems.,IN,HealthEdge Solutions,G06F,https://example.com/13
+P1014,2026,Quantum Resistant Encryption,A post-quantum encryption framework for cloud-based applications.,US,CryptoNext Corp,H04L,https://example.com/14
+P1015,2026,Low Latency Edge Networking,A networking protocol reducing latency in distributed edge environments.,JP,FastEdge Networks,H04L,https://example.com/15
+P1016,2025,AI Driven Predictive Maintenance,A predictive maintenance model using deep learning for industrial IoT.,US,MaintAI Systems,G06N,https://example.com/16
+P1017,2024,Secure API Gateway Architecture,A secure API gateway framework for cloud-native applications.,UK,APISecure Ltd,G06F,https://example.com/17
+P1018,2026,Carbon Aware Cloud Scheduling,A cloud workload scheduler optimized for low carbon energy sources.,DE,GreenCloud Tech,G06F,https://example.com/18
+P1019,2025,IoT Device Authentication Protocol,A lightweight authentication protocol for large scale IoT ecosystems.,IN,IoTSafe Pvt Ltd,H04L,https://example.com/19
+P1020,2026,Adaptive Edge Resource Management,A resource management system dynamically allocating compute at the edge.,US,EdgeDynamic Inc,G06F,https://example.com/20
