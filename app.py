@@ -52,6 +52,17 @@ if st.button("Analyze Idea"):
         if ws_path.exists():
             ws_df = pd.read_csv(ws_path)
             st.dataframe(ws_df.head(10))
+            st.subheader("Key Insights")
+            latest_year = trend_df.columns[-1]
+            top_keywords = trend_df[latest_year].sort_values(ascending=False).head(3)
+
+            st.write(f"Top growing themes in {latest_year}:")
+            for kw, val in top_keywords.items():
+                st.write(f"- {kw} (score: {round(val,3)})")
+
+            if ws_path.exists() and not ws_df.empty:
+                st.write("\nEmerging white space areas:")
+                for kw in ws_df["keyword"].head(3):
+                    st.write(f"- {kw}")
         else:
             st.info("White space candidate data not available yet.")
-
