@@ -1,0 +1,15 @@
+1. What are KPIs?
+KPI stands for Key Performance Indicator. In a business context, these are the "headline numbers" that an executive needs to see first.
+
+Fastest Growing Field: The system calculates the historical trendline for every technology category (like A01B or G06F) over several years. This shows the exact field with the steepest upward mathematical slope.
+High-Growth / Declining Fields: Out of all the technology fields, this is the count of how many are trending up vs. trending down.
+Top White-Space: The single biggest "untapped opportunity"—a technology that has a massive amount of academic research, but very few commercial patents filed so far.
+2. How are the Matrix & Recommendations generated? (CSV vs. APIs)
+The dashboard uses a powerful combination of both your friend's APIs and your local CSV data:
+
+Investment Priority Matrix (The Bubble Chart): This is built 100% from your local patents_clean.csv. The Python backend groups all the patents by their category (ipc_cpc), counts them up, and then runs a linear regression (a mathematical trend calculation) across the years to figure out the "Growth Slope". It plots that slope against the total number of patents.
+
+Top R&D Recommendations: This is also built from your local CSV. The backend looks at the slopes it just calculated; if a technology is mathematically exploding in volume, the system flags it as "HIGH PRIORITY" and generates the recommendation text you see on screen.
+
+White-Space & R&D Signals (The APIs): This is where your friend's API work kicks in. The backend takes the keywords from your local CSV and sends them to the arXiv API to see how often scientists are publishing research papers on those exact subjects right now. It then compares that live API data against the historical patent counts in your CSV to find "White-Space" gaps.
+

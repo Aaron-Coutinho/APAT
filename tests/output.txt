@@ -1,0 +1,30 @@
+WARNING:tensorflow:From C:\Users\Admin\AppData\Local\Programs\Python\Python311\Lib\site-packages\keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2026-03-12 20:43:21,893 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-03-12 20:43:25,431 - INFO - Use pytorch device_name: cpu
+2026-03-12 20:43:25,438 - INFO - Starting topic modeling on 20 documents...
+2026-03-12 20:43:25,438 - BERTopic - Embedding - Transforming documents to embeddings.
+Traceback (most recent call last):
+  File "D:\patent_intelligence_platform\tests\verify_topic_modeling.py", line 53, in <module>
+    test_topic_modeling_with_real_data()
+  File "D:\patent_intelligence_platform\tests\verify_topic_modeling.py", line 39, in test_topic_modeling_with_real_data
+    results_df = modeler.extract_topics_from_patents(patents_df)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\patent_intelligence_platform\backend\topic_modeling.py", line 56, in extract_topics_from_patents
+    topics, _ = self.fit_transform(docs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\patent_intelligence_platform\backend\topic_modeling.py", line 32, in fit_transform
+    self.topics, self.probs = self.topic_model.fit_transform(documents)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python311\Lib\site-packages\bertopic\_bertopic.py", line 458, in fit_transform
+    self.embedding_model = select_backend(self.embedding_model, language=self.language, verbose=self.verbose)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python311\Lib\site-packages\bertopic\backend\_utils.py", line 117, in select_backend
+    from ._sentencetransformers import SentenceTransformerBackend
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python311\Lib\site-packages\bertopic\backend\_sentencetransformers.py", line 4, in <module>
+    from sentence_transformers.models import StaticEmbedding
+ImportError: cannot import name 'StaticEmbedding' from 'sentence_transformers.models' (C:\Users\Admin\AppData\Local\Programs\Python\Python311\Lib\site-packages\sentence_transformers\models\__init__.py)
+Runtime JAX version: 0.4.38
+JAX tree_util has register_pytree_node: True
+Testing Topic Modeling with real patent data...
+Verification failed: cannot import name 'StaticEmbedding' from 'sentence_transformers.models' (C:\Users\Admin\AppData\Local\Programs\Python\Python311\Lib\site-packages\sentence_transformers\models\__init__.py)

@@ -1,1 +1,15 @@
+fastapi
+uvicorn
 streamlit
+pandas
+numpy<2.0.0
+faiss-cpu
+sentence-transformers==2.7.0
+plotly
+requests
+bertopic==0.16.2
+spacy
+beautifulsoup4
+feedparser
+jax[cpu]<0.5.0
+torch
