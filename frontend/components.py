@@ -514,3 +514,48 @@ def create_priority_matrix_chart(df) -> go.Figure:
         height=490,
     )
     return fig
+
+
+# ─── 12. Topic Clusters Chart ────────────────────────────────────────────────
+
+def create_topic_clusters_chart(df) -> go.Figure:
+    if df.empty:
+        return _empty_chart("No topic clusters available.")
+
+    # Filter out outlier topic -1
+    df_plot = df[df['Topic'] != -1].copy()
+    if df_plot.empty:
+        return _empty_chart("No valid topics found (only outliers).")
+
+    # Sort and get top 25 topics
+    df_plot = df_plot.sort_values('Count', ascending=True).tail(25)
+    
+    # Clean up the name for display (e.g. "0_audio_sound" -> "audio, sound")
+    df_plot['Clean_Name'] = df_plot['Name'].apply(lambda x: ", ".join(x.split('_')[1:4]) if '_' in x else x)
+
+    fig = go.Figure(go.Bar(
+        x=df_plot['Count'], y=df_plot['Clean_Name'],
+        orientation='h',
+        marker=dict(
+            color=df_plot['Count'],
+            colorscale=[[0, PURPLE], [0.5, CYAN], [1, ACCENT_GREEN]],
+            showscale=True,
+            colorbar=dict(title=dict(text="Patents", font=dict(color=TEXT_COLOR)),
+                          tickfont=dict(color=TEXT_COLOR))
+        ),
+        text=df_plot['Count'].apply(lambda v: f"{v:,}"),
+        textposition='outside',
+        textfont=dict(color=TEXT_COLOR, size=11, family="Inter"),
+        hovertemplate="<b>%{y}</b><br>Patents: %{x:,}<extra></extra>"
+    ))
+
+    fig.update_layout(
+        **_BASE_LAYOUT,
+        title=dict(text="Top Discovered Technology Themes (Topic Clusters)",
+                   font=dict(color=TEXT_COLOR, size=18, family="Inter")),
+        xaxis=dict(title="Number of Patents in Cluster", gridcolor='rgba(255,255,255,0.05)'),
+        yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+        height=max(400, len(df_plot) * 30),
+        margin=dict(l=20, r=80, t=60, b=30)
+    )
+    return fig

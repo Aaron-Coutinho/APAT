@@ -12,7 +12,8 @@ from components import (
     create_technology_distribution, create_field_innovation_strength,
     create_rd_trend_chart, create_applicant_landscape_chart,
     create_filing_trend_chart, create_problem_identification_chart,
-    create_forecast_chart, create_trajectory_chart, create_priority_matrix_chart
+    create_forecast_chart, create_trajectory_chart, create_priority_matrix_chart,
+    create_topic_clusters_chart
 )
 
 st.set_page_config(
@@ -368,7 +369,7 @@ with st.sidebar:
     st.divider()
 
     page = st.radio("Intelligence Modules", [
-        "🎯 Intelligence Dashboard",
+        "🎯 Policy Dashboard",
         "💡 Idea Validator",
         "📈 Market Intelligence",
         "📡 Tech Trends",
@@ -395,10 +396,10 @@ with st.sidebar:
 #  Pages
 # ══════════════════════════════════════════════════════════════════════════════
 
-# ── 🎯 Intelligence Dashboard ───────────────────────────────────────────────────────
-if page == "🎯 Intelligence Dashboard":
-    st.markdown("<h1>🎯 Intelligence Dashboard</h1>", unsafe_allow_html=True)
-    st.write("Executive summary of all intelligence modules — built for strategic R&D decision making.")
+# ── 🎯 Policy Dashboard ───────────────────────────────────────────────────────
+if page == "🎯 Policy Dashboard":
+    st.markdown("<h1>🎯 Policy Dashboard</h1>", unsafe_allow_html=True)
+    st.info("A single-screen executive summary pulling the most important metrics from every other page. It combines your CSV data with live arXiv signals to tell you exactly where to prioritize your R&D investment.")
 
     with st.spinner("Loading policy dashboard..."):
         try:
@@ -458,7 +459,7 @@ if page == "🎯 Intelligence Dashboard":
 # ── 💡 Idea Validator ─────────────────────────────────────────────────────────
 elif page == "💡 Idea Validator":
     st.markdown("<h1>💡 Semantic Validation Engine</h1>", unsafe_allow_html=True)
-    st.write("Assess the novelty of your idea against the patent landscape using real-time vector embeddings.")
+    st.info("Type a project or research idea in plain English. The system converts it into mathematical numbers and compares it against all patent abstracts to tell you how novel it is and identify similar prior art.")
 
     _card_open()
     idea_input = st.text_area("DESCRIBE YOUR RESEARCH OR PROJECT IDEA", height=110,
@@ -497,7 +498,7 @@ elif page == "💡 Idea Validator":
 # ── 🚀 White-Space ────────────────────────────────────────────────────────────
 elif page == "🚀 White-Space":
     st.markdown("<h1>🚀 White-Space Discovery</h1>", unsafe_allow_html=True)
-    st.write("High-velocity research signals mapped against patent density to surface unexplored innovation territories.")
+    st.info("Finds 'untapped opportunities' (Goldmines). It checks the arXiv API to see where academic research is growing fast, but commercial patents are still rare.")
 
     with st.spinner("Fetching arXiv + RSS signals and computing white-space scores..."):
         try:
@@ -532,7 +533,7 @@ elif page == "🚀 White-Space":
 # ── 📊 Patent Explorer ────────────────────────────────────────────────────────
 elif page == "📊 Patent Explorer":
     st.markdown("<h1>📊 Semantic Patent Explorer</h1>", unsafe_allow_html=True)
-    st.write("Enter any technology topic to retrieve semantically related patents from the indexed database.")
+    st.info("A smart search engine. Type any topic, and the system uses AI vector search to find and rank the top 20 most semantically relevant patents from your database.")
 
     _card_open()
     search_query = st.text_input("SEARCH TECHNOLOGY FIELD OR TOPIC",
@@ -585,7 +586,7 @@ elif page == "📊 Patent Explorer":
 # ── 🌐 IP Landscape ───────────────────────────────────────────────────────────
 elif page == "🌐 IP Landscape":
     st.markdown("<h1>🌐 Global IP Landscape</h1>", unsafe_allow_html=True)
-    st.write("Bird's-eye view of patent distribution and innovation velocity across technology sectors.")
+    st.info("A bird's-eye overview of your entire patent database. It simply reads your CSV file to show the full distribution of patents across all technology sectors.")
 
     try:
         df = pd.read_csv(CSV_PATH)
@@ -628,7 +629,7 @@ elif page == "🌐 IP Landscape":
 # ── 📈 Market Intelligence ────────────────────────────────────────────────────
 elif page == "📈 Market Intelligence":
     st.markdown("<h1>📈 Market Intelligence</h1>", unsafe_allow_html=True)
-    st.write("Live R&D activity from arXiv and news feeds, combined with competitive applicant analysis.")
+    st.info("Shows where the R&D world is investing right now. It pulls live academic paper counts from the arXiv API and combines it with the top companies filing patents in your database.")
 
     _section("R&D Activity by Technology")
     with st.spinner("Fetching arXiv R&D signals..."):
@@ -676,7 +677,7 @@ elif page == "📈 Market Intelligence":
 # ── 📡 Tech Trends ────────────────────────────────────────────────────────────
 elif page == "📡 Tech Trends":
     st.markdown("<h1>📡 Technological Trends & Problem Identification</h1>", unsafe_allow_html=True)
-    st.write("Rising and declining technology fields, and the core problems driving innovation.")
+    st.info("A historical view of your data. It graphs which technology fields are filing more patents over time, and analyzes patent abstracts to identify the most common problems inventors are trying to solve.")
 
     _section("Patent Filing Trends by Technology Field")
     with st.spinner("Computing filing trends..."):
@@ -721,7 +722,7 @@ elif page == "📡 Tech Trends":
 # ── 🔮 Future Trends ──────────────────────────────────────────────────────────
 elif page == "🔮 Future Trends":
     st.markdown("<h1>🔮 Future Trends & R&D Policy</h1>", unsafe_allow_html=True)
-    st.write("Data-driven projections and actionable R&D investment recommendations.")
+    st.info("Predicts the next 3 years of patent filings using linear regression on your historical data, and generates actionable AI recommendations on whether to increase or decrease investment in specific tech fields.")
 
     _section("3-Year Filing Forecast")
     with st.spinner("Running linear regression forecast..."):
@@ -778,7 +779,7 @@ elif page == "🔮 Future Trends":
 # ── 🧩 Topic Clusters ─────────────────────────────────────────────────────────
 elif page == "🧩 Topic Clusters":
     st.markdown("<h1>🧩 Technology Topic Clusters</h1>", unsafe_allow_html=True)
-    st.write("Automatically discovered technology clusters from the patent dataset using BERTopic.")
+    st.info("A Topic Cluster is a grouping of patents that talk about the exact same specific technology or concept, even if they don't use the exact same words. The AI read all your patents and grouped them into these hidden themes automatically.")
     _info("Results are loaded from disk cache for speed. To rebuild clusters, run: `python -m backend.topic_modeling --force`")
 
     with st.spinner("Loading topic clusters (fast if precomputed, slow on first run)..."):
@@ -791,9 +792,14 @@ elif page == "🧩 Topic Clusters":
                 df_patents = pd.DataFrame(data["patents_with_topics"])
 
                 _section("Discovered Topic Summary")
-                _card_open()
-                st.dataframe(df_topics, width='stretch', hide_index=True)
+                _card_open("padding:10px;")
+                st.plotly_chart(create_topic_clusters_chart(df_topics), width='stretch')
                 _card_close()
+
+                if st.checkbox("Show raw topic summary table"):
+                    _card_open()
+                    st.dataframe(df_topics, width='stretch', hide_index=True)
+                    _card_close()
 
                 if st.checkbox("Show patents mapped to topics"):
                     _card_open()
