@@ -5,8 +5,13 @@ import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-RAW_CSV_PATH = os.path.join(os.path.dirname(__file__), "patents_raw.csv")
-CLEAN_CSV_PATH = os.path.join(os.path.dirname(__file__), "patents_clean.csv")
+# Check both data/patents_raw.csv and data/raw/patents_raw.csv
+_base_dir = os.path.dirname(__file__)
+RAW_CSV_PATH = os.path.join(_base_dir, "patents_raw.csv")
+if not os.path.exists(RAW_CSV_PATH):
+    RAW_CSV_PATH = os.path.join(_base_dir, "raw", "patents_raw.csv")
+
+CLEAN_CSV_PATH = os.path.join(_base_dir, "patents_clean.csv")
 
 # Columns from Lens.org we actually need — everything else is dropped
 REQUIRED_COLUMNS = [

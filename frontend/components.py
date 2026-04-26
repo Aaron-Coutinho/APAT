@@ -223,31 +223,41 @@ def create_field_innovation_strength(df) -> go.Figure:
 def create_rd_trend_chart(df) -> go.Figure:
     fig = go.Figure()
 
-    fig.add_trace(go.Bar(
-        name="2024 Mentions", x=df['keyword'], y=df['mentions_2024'],
-        marker=dict(color=PURPLE, opacity=0.85),
-        hovertemplate="<b>%{x}</b><br>2024: %{y:,}<extra></extra>"
-    ))
-    fig.add_trace(go.Bar(
-        name="2025 Mentions", x=df['keyword'], y=df['mentions_2025'],
-        marker=dict(color=CYAN, opacity=0.95),
-        hovertemplate="<b>%{x}</b><br>2025: %{y:,}<extra></extra>"
-    ))
+    mention_cols = sorted([c for c in df.columns if c.startswith('mentions_')])
+    
+    if len(mention_cols) == 2:
+        year1 = mention_cols[0].split('_')[1]
+        year2 = mention_cols[1].split('_')[1]
+        
+        fig.add_trace(go.Bar(
+            name=f"{year1} Mentions", x=df['keyword'], y=df[mention_cols[0]],
+            marker=dict(color=PURPLE, opacity=0.85),
+            hovertemplate=f"<b>%{{x}}</b><br>{year1}: %{{y:,}}<extra></extra>"
+        ))
+        fig.add_trace(go.Bar(
+            name=f"{year2} Mentions", x=df['keyword'], y=df[mention_cols[1]],
+            marker=dict(color=CYAN, opacity=0.95),
+            hovertemplate=f"<b>%{{x}}</b><br>{year2}: %{{y:,}}<extra></extra>"
+        ))
 
-    for _, row in df.iterrows():
-        sign  = "+" if row['yoy_growth_pct'] >= 0 else ""
-        color = ACCENT_GREEN if row['yoy_growth_pct'] >= 0 else PINK
-        fig.add_annotation(
-            x=row['keyword'], y=row['mentions_2025'],
-            text=f"{sign}{row['yoy_growth_pct']}%",
-            showarrow=False, yshift=14,
-            font=dict(size=11, color=color, family="Inter", weight=700)
-        )
+        for _, row in df.iterrows():
+            sign  = "+" if row['yoy_growth_pct'] >= 0 else ""
+            color = ACCENT_GREEN if row['yoy_growth_pct'] >= 0 else PINK
+            fig.add_annotation(
+                x=row['keyword'], y=row[mention_cols[1]],
+                text=f"{sign}{row['yoy_growth_pct']}%",
+                showarrow=False, yshift=14,
+                font=dict(size=11, color=color, family="Inter", weight=700)
+            )
+            
+        title_text = f"R&D Activity: arXiv Mentions {year1} vs {year2}"
+    else:
+        title_text = "R&D Activity: arXiv Mentions"
 
     fig.update_layout(
         **_BASE_LAYOUT,
         barmode='group',
-        title=dict(text="R&D Activity: arXiv Mentions 2024 vs 2025",
+        title=dict(text=title_text,
                    font=dict(color=TEXT_COLOR, size=18, family="Inter")),
         xaxis=dict(tickangle=-30, gridcolor='rgba(255,255,255,0.05)'),
         yaxis=dict(gridcolor='rgba(255,255,255,0.05)', title="Mentions"),
@@ -437,7 +447,19 @@ def create_trajectory_chart(df) -> go.Figure:
     if df.empty:
         return _empty_chart("No trajectory data available.")
 
-    df_s = df.sort_values('slope', ascending=True)
+    # Remove strict "Stable" from the graph to avoid clutter
+    df_filtered = df[df['trajectory'] != "➡️ Stable"].copy()
+
+    # If everything is stable, show a clean message
+    if df_filtered.empty:
+        return _empty_chart("All fields are stable. No significant growth/decline detected.")
+
+    df_s = df_filtered.sort_values('slope', ascending=True)
+
+    # If there are still too many, limit to bottom 15 and top 15
+    if len(df_s) > 30:
+        import pandas as pd
+        df_s = pd.concat([df_s.head(15), df_s.tail(15)])
 
     fig = go.Figure(go.Bar(
         x=df_s['slope'], y=df_s['ipc_cpc'],

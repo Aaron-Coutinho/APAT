@@ -8,15 +8,26 @@ TRACKED_KEYWORDS = [
     "Liquid Cooling", "Predictive Maintenance"
 ]
 
-def get_rd_signals() -> pd.DataFrame:
+def get_rd_signals(patents_df: pd.DataFrame = None) -> pd.DataFrame:
     """
     Fetches R&D activity signals from arXiv and live RSS feeds.
     Returns a clean Market Intelligence dataset per technology keyword.
     """
     arxiv = ArxivService()
-    years = [2024, 2025]
+    
+    years = [2024, 2025] # fallback
+    if patents_df is not None:
+        df = patents_df.copy()
+        df.columns = [c.lower().strip() for c in df.columns]
+        df.rename(columns={"publication year": "year"}, inplace=True)
+        if 'year' in df.columns:
+            df['year'] = pd.to_numeric(df['year'], errors='coerce')
+            valid_years = df['year'].dropna().unique()
+            if len(valid_years) > 0:
+                latest_year = int(max(valid_years))
+                years = [latest_year - 1, latest_year]
 
-    print("Fetching arXiv R&D signals...")
+    print(f"Fetching arXiv R&D signals for years: {years}...")
     raw_data = arxiv.fetch_research_signals(TRACKED_KEYWORDS, years)
 
     print("Fetching live RSS signals...")
@@ -30,8 +41,8 @@ def get_rd_signals() -> pd.DataFrame:
     records = []
     for kw in TRACKED_KEYWORDS:
         counts = raw_data.get(kw, {})
-        mentions_2024 = counts.get(2024, 0)
-        mentions_2025 = counts.get(2025, 0)
+        mentions_prev = counts.get(years[0], 0)
+        mentions_latest = counts.get(years[1], 0)
 
         live_signal = 0
         if not rss_counts.empty:
@@ -39,19 +50,22 @@ def get_rd_signals() -> pd.DataFrame:
             live_signal = int(matches.sum())
 
         yoy_growth = 0.0
-        if mentions_2024 > 0:
-            yoy_growth = round(((mentions_2025 - mentions_2024) / mentions_2024) * 100, 2)
+        if mentions_prev > 0:
+            yoy_growth = round(((mentions_latest - mentions_prev) / mentions_prev) * 100, 2)
 
         records.append({
             "keyword": kw,
-            "mentions_2024": mentions_2024,
-            "mentions_2025": mentions_2025,
+            f"mentions_{years[0]}": mentions_prev,
+            f"mentions_{years[1]}": mentions_latest,
             "live_rss_signal": live_signal,
             "yoy_growth_pct": yoy_growth
         })
 
     df = pd.DataFrame(records)
-    df = df.sort_values(by="mentions_2025", ascending=False)
+    # Sort by the latest year
+    latest_col = f"mentions_{years[1]}"
+    if latest_col in df.columns:
+        df = df.sort_values(by=latest_col, ascending=False)
     return df
 
 

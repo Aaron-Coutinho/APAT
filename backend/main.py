@@ -14,7 +14,16 @@ from backend.logic_future_trends import (
     generate_rd_recommendations,
 )
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from data.process_data import ensure_clean_data_exists, process_raw_csv
+
 app = FastAPI(title="Patent Intelligence API")
+
+# Ensure dataset is generated if it doesn't exist
+ensure_clean_data_exists()
+
 vector_store = PatentVectorStore(csv_path="data/patents_clean.csv")
 
 # ─── Endpoint-level TTL Cache (1 hour) ────────────────────────────────────────
@@ -60,6 +69,40 @@ async def search_patents(request: IdeaRequest):
     return vector_store.search_idea(request.idea, top_k=20)["top_matches"]
 
 
+# ─── System Admin ─────────────────────────────────────────────────────────────
+
+@app.post("/api/reload_system")
+async def reload_system():
+    global vector_store
+    
+    # 1. Force reprocess the raw data
+    print("[/api/reload_system] Forcibly running data pipeline...")
+    success = process_raw_csv()
+    if not success:
+        return {"error": "Failed to process data/patents_raw.csv"}
+
+    # 2. Delete stale FAISS index so vector store rebuilds from fresh CSV
+    import shutil
+    faiss_store_path = "data/faiss_store"
+    if os.path.exists(faiss_store_path):
+        shutil.rmtree(faiss_store_path)
+        print(f"[/api/reload_system] Deleted stale FAISS store at '{faiss_store_path}'")
+
+    # 3. Reload the vector store memory (will rebuild from fresh CSV)
+    print("[/api/reload_system] Rebuilding vector store from fresh data...")
+    vector_store = PatentVectorStore(csv_path="data/patents_clean.csv")
+
+    # 4. Clear all backend caches
+    for cache in [_ws_cache, _topic_cache, _rd_cache, _applicant_cache, 
+                  _filing_cache, _problems_cache, _forecast_cache, 
+                  _trajectory_cache, _rec_cache, _dashboard_cache]:
+        cache["data"] = None
+        cache["ts"] = 0.0
+
+    return {"status": "success", "message": "System caches cleared and dataset reloaded."}
+
+
+
 # ─── White-Space ──────────────────────────────────────────────────────────────
 
 @app.get("/api/white_space")
@@ -101,12 +144,14 @@ async def get_topic_clusters():
 
 @app.get("/api/market_intelligence/rd_signals")
 async def get_market_rd_signals():
+    if vector_store.df is None:
+        return {"error": "Dataset not loaded."}
     if _is_fresh(_rd_cache):
         print("[/api/market_intelligence/rd_signals] Cache HIT")
         return _rd_cache["data"]
 
     print("[/api/market_intelligence/rd_signals] Cache MISS — fetching...")
-    df     = get_rd_signals()
+    df     = get_rd_signals(vector_store.df)
     result = df.to_dict(orient="records")
     return _set(_rd_cache, result)
 

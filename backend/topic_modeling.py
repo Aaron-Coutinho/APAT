@@ -67,6 +67,7 @@ class PatentTopicModeler:
         return self.topic_model.get_topic_info()
 
     def extract_topics_from_patents(self, patents_df: pd.DataFrame) -> pd.DataFrame:
+        patents_df.columns = [c.lower().strip() for c in patents_df.columns]
         patents_df['full_text'] = patents_df['title'] + ". " + patents_df['abstract']
         docs = patents_df['full_text'].tolist()
 

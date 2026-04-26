@@ -389,7 +389,14 @@ with st.sidebar:
 
     if st.button("🔄 Refresh All Caches"):
         st.cache_data.clear()
-        st.success("Cache cleared — data will reload.")
+        try:
+            r = requests.post(f"{API_URL}/reload_system", timeout=60)
+            if r.status_code == 200:
+                st.success("System caches cleared and dataset fully reloaded.")
+            else:
+                st.error("Failed to reload backend system caches.")
+        except Exception as e:
+            st.error(f"Could not connect to backend: {e}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -571,12 +578,19 @@ elif page == "📊 Patent Explorer":
                 _err("Backend connection failed.")
     else:
         _info("Enter a topic above to explore semantically related patents.")
-        if st.checkbox("View raw dataset (2024–2026 only)"):
+        if st.checkbox("View raw dataset (Recent 3 Years)"):
             try:
                 df = pd.read_csv(CSV_PATH)
                 df.columns = [c.lower().strip() for c in df.columns]
                 df.rename(columns={"publication year":"year","applicants":"applicant"}, inplace=True)
-                df = df[df['year'].astype(str).isin(['2024','2025','2026'])]
+                
+                if 'year' in df.columns:
+                    df['year'] = pd.to_numeric(df['year'], errors='coerce')
+                    valid_years = df['year'].dropna().unique()
+                    if len(valid_years) > 0:
+                        recent_years = sorted(valid_years)[-3:]
+                        df = df[df['year'].isin(recent_years)]
+                        
                 st.dataframe(df, width='stretch')
             except FileNotFoundError:
                 _err("Dataset not found in 'data/' directory.")
@@ -709,9 +723,25 @@ elif page == "📡 Tech Trends":
             else:
                 df_p = pd.DataFrame(prob_data)
                 _card_open("padding:10px;")
-                st.plotly_chart(create_problem_identification_chart(df_p), width='stretch')
+                event = st.plotly_chart(
+                    create_problem_identification_chart(df_p), 
+                    width='stretch', 
+                    on_select="rerun"
+                )
                 _card_close()
-                if st.checkbox("Show detailed problem statements"):
+                
+                selected_phrase = None
+                if event and "selection" in event and "points" in event["selection"] and len(event["selection"]["points"]) > 0:
+                    selected_phrase = event["selection"]["points"][0].get("y", None)
+                
+                if selected_phrase:
+                    st.markdown(f"### 🔍 Detailed Context for **'{selected_phrase}'**")
+                    filtered_df = df_p[df_p['problem_phrase'] == selected_phrase]
+                    cols = [c for c in ['problem_phrase','context','ipc_cpc','title'] if c in filtered_df.columns]
+                    st.dataframe(filtered_df[cols], width='stretch', hide_index=True)
+                    st.caption("Click whitespace in the chart to clear the selection.")
+                
+                if st.checkbox("Show all detailed problem statements"):
                     if not df_p.empty:
                         cols = [c for c in ['problem_phrase','context','ipc_cpc','title'] if c in df_p.columns]
                         st.dataframe(df_p[cols], width='stretch', hide_index=True)
